@@ -2,13 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:my_innowise_pokemon/model/poke_page.dart';
 
 class PokemonRepository {
-  Future<PokePage> getPokemonPage({int page = 0}) async {
+  Future<PokePage> getPokemonPage({int startWith = 0}) async {
     const baseUrl = 'pokeapi.co';
     final client = Dio();
 
     final queryParameters = {
       'limit': '20',
-      'offset': (page * 20).toString(),
+      'offset': startWith.toString(),
     };
 
     final uri = Uri.https(baseUrl, 'api/v2/pokemon', queryParameters);

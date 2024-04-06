@@ -7,7 +7,7 @@ class PokePage {
   const PokePage({required this.hasNext, required this.pokeList});
 
   factory PokePage.fromJson(Map<String, dynamic> json) {
-    final hasNext = json['next'];
+    final hasNext = json['next'] != null;
     final pokeList = (json['results'] as List)
         .map((json) => PokeListPart.fromJson(json))
         .toList();
