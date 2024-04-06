@@ -4,7 +4,7 @@ class PokePage {
   final bool hasNext;
   final List<PokeListPart> pokeList;
 
-  PokePage({required this.hasNext, required this.pokeList});
+  const PokePage({required this.hasNext, required this.pokeList});
 
   factory PokePage.fromJson(Map<String, dynamic> json) {
     final hasNext = json['next'];
