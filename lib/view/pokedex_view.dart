@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_innowise_pokemon/bloc/poke_bloc.dart';
+import 'package:my_innowise_pokemon/cubit/nav_cubit.dart';
 
 class PokedexView extends StatefulWidget {
   const PokedexView({super.key});
@@ -68,6 +69,11 @@ class _PokedexViewState extends State<PokedexView> {
                       : ListTile(
                           title:
                               Center(child: Text(state.pokeList[index].name)),
+                          onTap: () {
+                            context
+                                .read<NavCubit>()
+                                .showPokemonDetails(state.pokeList[index].id);
+                          },
                         );
                 },
                 itemCount: state.hasReachedMax
