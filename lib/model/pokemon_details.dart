@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
+
 class PokemonDetails {
   final int pokemonId;
-  final String imageUrl;
+  final Uint8List image;
   final String name;
   final List<String> types;
   final int height;
@@ -8,7 +10,7 @@ class PokemonDetails {
 
   PokemonDetails(
       {required this.pokemonId,
-      required this.imageUrl,
+      required this.image,
       required this.name,
       required this.types,
       required this.height,
@@ -17,8 +19,7 @@ class PokemonDetails {
   factory PokemonDetails.fromJson(Map<String, dynamic> json) {
     final pokemonId = json['id'];
     final name = json['name'];
-    final imageUrl =
-        json['sprites']['other']['official-artwork']['front_default'];
+    final image = json['sprites']['other']['official-artwork']['front_default'];
     final types = (json['types'] as List)
         .map((e) => e['type']['name'] as String)
         .toList();
@@ -27,7 +28,7 @@ class PokemonDetails {
 
     return PokemonDetails(
       pokemonId: pokemonId,
-      imageUrl: imageUrl,
+      image: image,
       name: name,
       types: types,
       height: height,

@@ -32,20 +32,21 @@ class PokeBloc extends Bloc<PokeEvent, PokeState> {
     PokeEvent event,
     Emitter<PokeState> emit,
   ) async {
-    if (state.hasReachedMax) {
-      return;
-    }
     try {
       if (state.status == PokeStatus.initial) {
         final pokePage = await pokemonRepository.getPokemonPage();
         return emit(state.copyWith(
           status: PokeStatus.success,
-          hasReachedMax: false,
+          hasReachedMax: !pokePage.hasNext,
           pokeList: pokePage.pokeList,
         ));
       }
+      if (state.hasReachedMax) {
+        return;
+      }
       final pokePage = await pokemonRepository.getPokemonPage(
-          startWith: state.pokeList.length);
+        startWith: state.pokeList.length,
+      );
       return pokePage.hasNext
           ? emit(state.copyWith(
               status: PokeStatus.success,
