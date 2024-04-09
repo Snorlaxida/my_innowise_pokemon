@@ -1,4 +1,3 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_innowise_pokemon/bloc/poke_bloc.dart';
@@ -51,7 +50,6 @@ class _PokedexViewState extends State<PokedexView> {
       ),
       body: BlocListener<InternetCubit, InternetState>(
         listener: (context, state) {
-          print(state.type);
           if (state.type == InternetTypes.offline) {
             context.read<PokeBloc>().add(NoInternetEvent());
           } else if (state.type == InternetTypes.connected) {
@@ -64,47 +62,124 @@ class _PokedexViewState extends State<PokedexView> {
               case PokeStatus.initial:
                 return const Center(child: CircularProgressIndicator());
               case PokeStatus.offline:
-                return ListView.builder(
+                if (state.pokeList.isEmpty) {
+                  return const Center(child: Text('No cached pokemons'));
+                }
+                return GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
                   itemCount: state.pokeList.length,
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Center(child: Text(state.pokeList[index].name)),
+                    return GestureDetector(
                       onTap: () {
                         context
                             .read<NavCubit>()
                             .showPokemonDetails(state.pokeList[index].id);
                       },
+                      child: Card(
+                        child: GridTile(
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 150,
+                                height: 150,
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: Image.memory(
+                                          state.pokeList[index].image!,
+                                        ).image,
+                                        fit: BoxFit.cover)),
+                              ),
+                              Text(state.pokeList[index].name)
+                            ],
+                          ),
+                        ),
+                      ),
                     );
                   },
                 );
+              // return ListView.builder(
+              //   itemCount: state.pokeList.length,
+              //   itemBuilder: (context, index) {
+              //     return ListTile(
+              //       title: Center(child: Text(state.pokeList[index].name)),
+              //       onTap: () {
+              //         context
+              //             .read<NavCubit>()
+              //             .showPokemonDetails(state.pokeList[index].id);
+              //       },
+              //     );
+              //   },
+              // );
               case PokeStatus.failure:
                 return const Center(child: Text('Failed to load pokemons!'));
               case PokeStatus.success:
                 if (state.pokeList.isEmpty) {
                   return const Center(child: Text('No pokemons'));
                 }
-                return ListView.builder(
-                  itemBuilder: (BuildContext context, int index) {
+                return GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemCount: state.hasReachedMax
+                      ? state.pokeList.length
+                      : state.pokeList.length + 1,
+                  controller: scrollController,
+                  itemBuilder: (context, index) {
                     return index >= state.pokeList.length
                         ? const Padding(
                             padding: EdgeInsets.symmetric(vertical: 30),
                             child: Center(child: CircularProgressIndicator()),
                           )
-                        : ListTile(
-                            title:
-                                Center(child: Text(state.pokeList[index].name)),
+                        : GestureDetector(
                             onTap: () {
                               context
                                   .read<NavCubit>()
                                   .showPokemonDetails(state.pokeList[index].id);
                             },
+                            child: Card(
+                              child: GridTile(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 150,
+                                      height: 150,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: Image.network(
+                                                state.pokeList[index].imageUrl,
+                                              ).image,
+                                              fit: BoxFit.cover)),
+                                    ),
+                                    Text(state.pokeList[index].name)
+                                  ],
+                                ),
+                              ),
+                            ),
                           );
                   },
-                  itemCount: state.hasReachedMax
-                      ? state.pokeList.length
-                      : state.pokeList.length + 1,
-                  controller: scrollController,
                 );
+              // return ListView.builder(
+              //   itemBuilder: (BuildContext context, int index) {
+              //     return index >= state.pokeList.length
+              //         ? const Padding(
+              //             padding: EdgeInsets.symmetric(vertical: 30),
+              //             child: Center(child: CircularProgressIndicator()),
+              //           )
+              //         : ListTile(
+              //             title:
+              //                 Center(child: Text(state.pokeList[index].name)),
+              //             onTap: () {
+              //               context
+              //                   .read<NavCubit>()
+              //                   .showPokemonDetails(state.pokeList[index].id);
+              //             },
+              //           );
+              //   },
+              //   itemCount: state.hasReachedMax
+              //       ? state.pokeList.length
+              //       : state.pokeList.length + 1,
+              //   controller: scrollController,
+              // );
             }
           },
         ),
