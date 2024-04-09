@@ -26,6 +26,9 @@ class PokeBloc extends Bloc<PokeEvent, PokeState> {
       _onLoadPokemonsEvent,
       transformer: throttleDroppable(throttleDuration),
     );
+    on<NoInternetEvent>(
+      _onNoInternetEvent,
+    );
   }
 
   Future<void> _onLoadPokemonsEvent(
@@ -51,9 +54,25 @@ class PokeBloc extends Bloc<PokeEvent, PokeState> {
           ? emit(state.copyWith(
               status: PokeStatus.success,
               hasReachedMax: false,
-              pokeList: List.of(state.pokeList)..addAll(pokePage.pokeList),
+              pokeList: List.of(state.pokeList)..addAll(pokePage.pokeList!),
             ))
           : emit(state.copyWith(hasReachedMax: true));
+    } catch (e) {
+      emit(state.copyWith(status: PokeStatus.failure));
+    }
+  }
+
+  Future<void> _onNoInternetEvent(
+    PokeEvent event,
+    Emitter<PokeState> emit,
+  ) async {
+    try {
+      final pokePage = await pokemonRepository.getPokemonPageFromDb();
+      return emit(state.copyWith(
+        status: PokeStatus.offline,
+        hasReachedMax: false,
+        pokeList: pokePage.pokeList,
+      ));
     } catch (e) {
       emit(state.copyWith(status: PokeStatus.failure));
     }

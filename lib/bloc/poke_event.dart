@@ -6,3 +6,5 @@ sealed class PokeEvent extends Equatable {
 }
 
 final class LoadPokemonsEvent extends PokeEvent {}
+
+final class NoInternetEvent extends PokeEvent {}

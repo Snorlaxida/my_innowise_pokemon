@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:my_innowise_pokemon/model/poke_page.dart';
 import 'package:my_innowise_pokemon/model/pokemon_details.dart';
+import 'package:my_innowise_pokemon/service/database_service.dart';
 
 const baseUrl = 'pokeapi.co';
 
@@ -21,15 +21,24 @@ class PokemonRepository {
     return PokePage.fromJson(json);
   }
 
+  Future<PokePage> getPokemonPageFromDb() async {
+    final cachedPokemons = await DatabaseService.getAllPokeListParts();
+    return PokePage(hasNext: false, pokeList: cachedPokemons);
+  }
+
   Future<PokemonDetails> getPokemonDetails(int pokemonId) async {
     final uri = Uri.https(baseUrl, 'api/v2/pokemon/$pokemonId');
-
+    final pokemonDetail = await DatabaseService.getPokemonDetails(pokemonId);
+    if (pokemonDetail != null) {
+      return pokemonDetail;
+    }
     try {
       final response = await client.getUri(uri);
       final json = response.data;
       json['sprites']['other']['official-artwork']['front_default'] =
           await _convertImageUrlToUint8List(
               json['sprites']['other']['official-artwork']['front_default']);
+      await DatabaseService.addPokemon(PokemonDetails.fromJson(json));
       return PokemonDetails.fromJson(json);
     } catch (e) {
       rethrow;

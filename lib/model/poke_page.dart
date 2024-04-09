@@ -2,7 +2,7 @@ import 'package:my_innowise_pokemon/model/poke_list_part.dart';
 
 class PokePage {
   final bool hasNext;
-  final List<PokeListPart> pokeList;
+  final List<PokeListPart>? pokeList;
 
   const PokePage({required this.hasNext, required this.pokeList});
 

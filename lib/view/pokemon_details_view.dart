@@ -26,7 +26,7 @@ class PokemonDetailsView extends StatelessWidget {
                         decoration: BoxDecoration(
                             image: DecorationImage(
                                 image: Image.memory(
-                                  state.image,
+                                  state.image!,
                                 ).image,
                                 fit: BoxFit.cover)),
                       ),
